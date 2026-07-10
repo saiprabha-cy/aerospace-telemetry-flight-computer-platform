@@ -1,11 +1,22 @@
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from config.config import (
+    LOW_BATTERY_LIMIT,
+    HIGH_TEMPERATURE_LIMIT
+)
 import csv
 import os
 
-# Path to input sensor data
-INPUT_FILE = "../simulations/sensor_data.csv"
+from config.paths import (
+    SENSOR_DATA_FILE,
+    FLIGHT_LOG_FILE
+)
 
-# Output flight log
-OUTPUT_FILE = "flight_log.csv"
+INPUT_FILE = SENSOR_DATA_FILE
+OUTPUT_FILE = FLIGHT_LOG_FILE
 
 # Check if sensor data exists
 if not os.path.exists(INPUT_FILE):
@@ -39,10 +50,10 @@ with open(INPUT_FILE, "r") as infile, open(OUTPUT_FILE, "w", newline="") as outf
 
         status = "HEALTHY"
 
-        if battery < 22:
+        if battery < LOW_BATTERY_LIMIT:
             status = "LOW BATTERY"
 
-        if temperature > 80:
+        if temperature > HIGH_TEMPERATURE_LIMIT:
             status = "HIGH TEMPERATURE"
 
         if altitude < 0:

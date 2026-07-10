@@ -1,9 +1,22 @@
-import csv
-import json
+import sys
 import os
 
-INPUT_FILE = "../flight_computer/flight_log.csv"
-OUTPUT_FILE = "telemetry_packets.json"
+# Add project root to Python path
+sys.path.append(
+    os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..")
+    )
+)
+
+import csv
+import json
+
+from config.paths import (
+    FLIGHT_LOG_FILE,
+    TELEMETRY_FILE
+)
+INPUT_FILE = FLIGHT_LOG_FILE
+OUTPUT_FILE = TELEMETRY_FILE
 
 if not os.path.exists(INPUT_FILE):
     print("Error: flight_log.csv not found.")

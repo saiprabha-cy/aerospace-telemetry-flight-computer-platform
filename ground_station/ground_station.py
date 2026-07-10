@@ -1,8 +1,18 @@
-import json
+import sys
 import os
+import json
 
-INPUT_FILE = "../telemetry/telemetry_packets.json"
-OUTPUT_FILE = "mission_report.txt"
+sys.path.append(
+    os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..")
+    )
+)
+from config.paths import (
+    TELEMETRY_FILE,
+    MISSION_REPORT_FILE
+)
+INPUT_FILE = TELEMETRY_FILE
+OUTPUT_FILE = MISSION_REPORT_FILE
 
 if not os.path.exists(INPUT_FILE):
     print("Telemetry packets not found.")
