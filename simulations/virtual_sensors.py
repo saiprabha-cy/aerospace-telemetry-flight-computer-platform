@@ -1,15 +1,24 @@
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from config.config import (
+    NUM_SAMPLES,
+    INITIAL_TEMPERATURE,
+    INITIAL_ALTITUDE,
+    INITIAL_VELOCITY,
+    INITIAL_BATTERY
+)
 import csv
 import time
 import random
 
-# Number of samples to generate
-NUM_SAMPLES = 100
-
 # Initial values
-altitude = 0.0          # meters
-velocity = 0.0          # m/s
-temperature = 28.0      # Celsius
-battery_voltage = 24.0  # Volts
+altitude = INITIAL_ALTITUDE
+velocity = INITIAL_VELOCITY
+temperature = INITIAL_TEMPERATURE
+battery_voltage = INITIAL_BATTERY
 
 # CSV file creation
 with open("sensor_data.csv", mode="w", newline="") as file:
