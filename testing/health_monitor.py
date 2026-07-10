@@ -1,8 +1,17 @@
-import csv
+import sys
 import os
-
-INPUT_FILE = "../flight_computer/flight_log.csv"
-OUTPUT_FILE = "health_report.txt"
+import csv
+sys.path.append(
+    os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..")
+    )
+)
+from config.paths import (
+    FLIGHT_LOG_FILE,
+    HEALTH_REPORT_FILE
+)
+INPUT_FILE = FLIGHT_LOG_FILE
+OUTPUT_FILE = HEALTH_REPORT_FILE
 
 if not os.path.exists(INPUT_FILE):
     print("flight_log.csv not found.")
