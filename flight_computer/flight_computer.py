@@ -1,80 +1,89 @@
 import sys
 import os
+import csv
 
+# Add project root to Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from utils.logger import logger
 
 from config.config import (
     LOW_BATTERY_LIMIT,
     HIGH_TEMPERATURE_LIMIT
 )
-import csv
-import os
 
 from config.paths import (
     SENSOR_DATA_FILE,
     FLIGHT_LOG_FILE
 )
 
+# Input and Output files
 INPUT_FILE = SENSOR_DATA_FILE
 OUTPUT_FILE = FLIGHT_LOG_FILE
 
-# Check if sensor data exists
+# Check whether sensor data exists
 if not os.path.exists(INPUT_FILE):
-    print("Error: sensor_data.csv not found.")
-    exit()
+    logger.error("sensor_data.csv not found.")
+    raise FileNotFoundError(INPUT_FILE)
 
-print("Reading sensor data...\n")
+logger.info("Reading sensor data...")
 
-with open(INPUT_FILE, "r") as infile, open(OUTPUT_FILE, "w", newline="") as outfile:
+try:
 
-    reader = csv.DictReader(infile)
+    with open(INPUT_FILE, "r") as infile, open(OUTPUT_FILE, "w", newline="") as outfile:
 
-    fieldnames = [
-        "Timestamp",
-        "Temperature_C",
-        "Altitude_m",
-        "Velocity_mps",
-        "Battery_V",
-        "System_Status"
-    ]
+        reader = csv.DictReader(infile)
 
-    writer = csv.DictWriter(outfile, fieldnames=fieldnames)
-    writer.writeheader()
+        fieldnames = [
+            "Timestamp",
+            "Temperature_C",
+            "Altitude_m",
+            "Velocity_mps",
+            "Battery_V",
+            "System_Status"
+        ]
 
-    for row in reader:
+        writer = csv.DictWriter(outfile, fieldnames=fieldnames)
+        writer.writeheader()
 
-        temperature = float(row["Temperature_C"])
-        altitude = float(row["Altitude_m"])
-        velocity = float(row["Velocity_mps"])
-        battery = float(row["Battery_V"])
+        for row in reader:
 
-        status = "HEALTHY"
+            temperature = float(row["Temperature_C"])
+            altitude = float(row["Altitude_m"])
+            velocity = float(row["Velocity_mps"])
+            battery = float(row["Battery_V"])
 
-        if battery < LOW_BATTERY_LIMIT:
-            status = "LOW BATTERY"
+            status = "HEALTHY"
 
-        if temperature > HIGH_TEMPERATURE_LIMIT:
-            status = "HIGH TEMPERATURE"
+            if battery < LOW_BATTERY_LIMIT:
+                status = "LOW BATTERY"
 
-        if altitude < 0:
-            status = "ALTITUDE ERROR"
+            if temperature > HIGH_TEMPERATURE_LIMIT:
+                status = "HIGH TEMPERATURE"
 
-        print("-------------------------------------")
-        print(f"Time        : {row['Timestamp']} s")
-        print(f"Temperature : {temperature:.2f} °C")
-        print(f"Altitude    : {altitude:.2f} m")
-        print(f"Velocity    : {velocity:.2f} m/s")
-        print(f"Battery     : {battery:.2f} V")
-        print(f"Status      : {status}")
+            if altitude < 0:
+                status = "ALTITUDE ERROR"
 
-        writer.writerow({
-            "Timestamp": row["Timestamp"],
-            "Temperature_C": temperature,
-            "Altitude_m": altitude,
-            "Velocity_mps": velocity,
-            "Battery_V": battery,
-            "System_Status": status
-        })
+            logger.info(
+                f"Time: {row['Timestamp']} s | "
+                f"Temp: {temperature:.2f} °C | "
+                f"Altitude: {altitude:.2f} m | "
+                f"Velocity: {velocity:.2f} m/s | "
+                f"Battery: {battery:.2f} V | "
+                f"Status: {status}"
+            )
 
-print("\nFlight Computer Processing Complete.")
-print("flight_log.csv generated successfully.")
+            writer.writerow({
+                "Timestamp": row["Timestamp"],
+                "Temperature_C": temperature,
+                "Altitude_m": altitude,
+                "Velocity_mps": velocity,
+                "Battery_V": battery,
+                "System_Status": status
+            })
+
+    logger.info("Flight Computer Processing Complete.")
+    logger.info("flight_log.csv generated successfully.")
+
+except Exception as e:
+    logger.exception(f"Flight computer failed: {e}")
