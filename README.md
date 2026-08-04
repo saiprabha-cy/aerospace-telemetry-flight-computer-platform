@@ -1,4 +1,28 @@
 # Aerospace Telemetry, Flight Computer & Instrumentation Development Platform (ATFIDP)
+## Current Status
+
+**Current Version:** v1.1.0
+
+### Completed
+
+- Software Simulation
+- Virtual Sensors
+- Flight Computer
+- Telemetry Engine
+- Ground Station
+- Health Monitor
+- Mission Controller
+- Mission State Machine
+- Mission Timeline
+- Mission Scheduler
+- Fault Management
+- Unit Testing
+- Logging Framework
+- Configuration Management
+
+### Next Phase
+
+Embedded Firmware Development using STM32CubeIDE
 
 ## Overview
 

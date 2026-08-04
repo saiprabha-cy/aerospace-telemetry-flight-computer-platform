@@ -1,26 +1,47 @@
 import sys
 import os
 
+# --------------------------------------------------
 # Add project root to Python path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+# --------------------------------------------------
+
+sys.path.append(
+    os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..")
+    )
+)
 
 import csv
 import random
 
 from utils.logger import logger
-from config.config import (
-    NUM_SAMPLES,
-    INITIAL_TEMPERATURE,
-    INITIAL_ALTITUDE,
-    INITIAL_VELOCITY,
-    INITIAL_BATTERY
-)
+
+from config.mission_loader import CONFIG
 from config.paths import SENSOR_DATA_FILE
 
-# Output CSV path
+# --------------------------------------------------
+# Mission Configuration
+# --------------------------------------------------
+
+random.seed(CONFIG["simulation"]["random_seed"])
+
+NUM_SAMPLES = CONFIG["simulation"]["samples"]
+
+INITIAL_TEMPERATURE = CONFIG["temperature"]["initial_temperature"]
+INITIAL_ALTITUDE = CONFIG["flight"]["initial_altitude"]
+INITIAL_VELOCITY = CONFIG["flight"]["initial_velocity"]
+INITIAL_BATTERY = CONFIG["battery"]["initial_voltage"]
+
+# --------------------------------------------------
+# Output CSV Path
+# --------------------------------------------------
+
 OUTPUT_FILE = SENSOR_DATA_FILE
 
-# Initial values
+# --------------------------------------------------
+# Initial Values
+# --------------------------------------------------
+
 altitude = INITIAL_ALTITUDE
 velocity = INITIAL_VELOCITY
 temperature = INITIAL_TEMPERATURE
@@ -29,6 +50,7 @@ battery_voltage = INITIAL_BATTERY
 logger.info("Generating sensor data...")
 
 try:
+
     with open(OUTPUT_FILE, "w", newline="") as csvfile:
 
         writer = csv.writer(csvfile)
@@ -44,6 +66,7 @@ try:
         for second in range(NUM_SAMPLES):
 
             # Simulated rocket ascent behaviour
+
             velocity += random.uniform(1, 5)
             altitude += velocity
             temperature += random.uniform(-0.3, 0.5)
@@ -71,4 +94,7 @@ try:
     logger.info("sensor_data.csv generated successfully.")
 
 except Exception as e:
-    logger.exception(f"Failed to generate sensor_data.csv: {e}")
+
+    logger.exception(
+        f"Failed to generate sensor_data.csv: {e}"
+    )

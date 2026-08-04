@@ -1,0 +1,31 @@
+{
+    "mission": {
+        "name": "Aerospace Telemetry, Flight Computer & Instrumentation Development Platform",
+        "short_name": "ATFIDP",
+        "version": "1.1.0"
+    },
+
+    "simulation": {
+        "samples": 100,
+        "random_seed": 42
+    },
+
+    "battery": {
+        "warning_voltage": 22.0,
+        "initial_voltage": 24.0
+    },
+
+    "temperature": {
+        "warning_temperature": 80,
+        "initial_temperature": 28.0
+    },
+
+    "flight": {
+        "initial_altitude": 0,
+        "initial_velocity": 0
+    },
+
+    "logging": {
+        "level": "INFO"
+    }
+}
