@@ -33,9 +33,8 @@ MISSION_REPORT_FILE = os.path.join(
     "mission_report.txt"
 )
 
-# Testing Files
 HEALTH_REPORT_FILE = os.path.join(
     PROJECT_ROOT,
-    "testing",
+    "health_monitor",
     "health_report.txt"
 )

@@ -1,272 +1,149 @@
-# Aerospace Telemetry and Flight Computer Integrated Development Platform (ATFIDP)
+# Aerospace Telemetry, Flight Computer & Instrumentation Development Platform (ATFIDP)
 
-> A software-first aerospace avionics development platform designed to simulate telemetry, flight computer logic, mission monitoring, and system health validation before deployment to embedded hardware.
+## Overview
 
----
+ATFIDP is a software-first aerospace engineering project that simulates the core software components commonly found in experimental rockets, CubeSats, and embedded aerospace systems.
 
-# Project Overview
+The project focuses on instrumentation, telemetry processing, health monitoring, and flight computer software before transitioning to embedded firmware and hardware implementation.
 
-The Aerospace Telemetry and Flight Computer Integrated Development Platform (ATFIDP) is an educational and engineering-oriented project that simulates the software architecture commonly found in modern launch vehicles, sounding rockets, CubeSats, and spacecraft.
+The development approach follows an incremental workflow:
 
-Rather than beginning with hardware, this project follows a software-first development methodology similar to that used in professional aerospace organizations, where algorithms, telemetry pipelines, and flight logic are validated extensively before deployment onto embedded processors.
-
-The project will progressively evolve from software simulation into embedded firmware, communication systems, signal processing, PCB hardware, and complete aerospace system integration.
+Software Simulation → Embedded Firmware → Signal Processing → Rocket Simulation → Hardware Prototype
 
 ---
 
-# Objectives
+## Project Objectives
 
-- Learn professional embedded software engineering
-- Understand aerospace telemetry systems
-- Simulate onboard flight computer operations
-- Design modular avionics software
-- Build reusable aerospace software architecture
-- Transition simulation into STM32 firmware
-- Develop communication systems for aerospace applications
-- Design custom avionics hardware using KiCad
-- Integrate software with OpenRocket flight simulation
+- Develop modular aerospace software architecture.
+- Simulate flight instrumentation.
+- Design a telemetry generation pipeline.
+- Build a simplified flight computer.
+- Monitor system health.
+- Detect and classify faults.
+- Prepare software for STM32 embedded implementation.
 
 ---
 
-# Current Features
+## Current Features
 
-✔ Virtual Sensor Simulation
-
-✔ Flight Computer Processing
-
-✔ Telemetry Packet Generation
-
-✔ Ground Station Monitoring
-
-✔ Health Monitoring
-
-✔ Configuration Management
-
-✔ Centralized Logging
-
-✔ Exception Handling
-
-✔ Modular Repository Structure
+- Virtual Sensor Simulation
+- Flight Computer
+- Telemetry Packet Generator
+- Ground Station
+- Health Monitoring
+- Mission Controller
+- Mission Scheduler
+- Mission Timeline
+- Mission State Machine
+- Fault Injection
+- Fault Detection
+- Logging System
+- Configuration Management
+- Unit Testing
 
 ---
 
-# System Architecture
+## Software Architecture
 
 ```
-                 +-----------------------+
-                 |  Virtual Sensors      |
-                 +-----------+-----------+
-                             |
-                             v
-                 +-----------------------+
-                 |  Flight Computer      |
-                 +-----------+-----------+
-                             |
-                             v
-                 +-----------------------+
-                 |  Telemetry Engine     |
-                 +-----------+-----------+
-                             |
-                             v
-                 +-----------------------+
-                 |  Ground Station       |
-                 +-----------+-----------+
-                             |
-                             v
-                 +-----------------------+
-                 |  Health Monitor       |
-                 +-----------------------+
+Virtual Sensors
+        │
+        ▼
+Flight Computer
+        │
+        ▼
+Telemetry Engine
+        │
+        ▼
+Ground Station
+        │
+        ▼
+Health Monitor
+        │
+        ▼
+Fault Management
 ```
+
+Mission Controller coordinates the execution of each subsystem.
+
+Mission Scheduler demonstrates periodic task execution.
+
+Mission State Machine models mission progression.
+
+Mission Timeline simulates Mission Elapsed Time (MET).
 
 ---
 
-# Repository Structure
+## Project Structure
 
-```text
+```
 ATFIDP/
 
 ├── architecture/
 ├── config/
 ├── docs/
+├── fault_management/
 ├── flight_computer/
 ├── ground_station/
-├── logs/
-├── models/
+├── health_monitor/
+├── mission_control/
+├── mission_scheduler/
+├── mission_timeline/
 ├── reports/
 ├── simulations/
+├── state_machine/
 ├── telemetry/
-├── testing/
+├── tests/
 ├── utils/
-
-├── CHANGELOG.md
-├── LICENSE
 ├── README.md
-├── requirements.txt
-└── .gitignore
+├── LICENSE
+└── requirements.txt
 ```
 
 ---
 
-# Technology Stack
+## Technologies Used
 
-## Programming
-
-- Python
-
-## Version Control
-
+- Python 3
+- VS Code
 - Git
 - GitHub
-
-## Documentation
-
-- Markdown
-
-## Architecture
-
 - Draw.io
 
-## Future Development
-
-- STM32CubeIDE
-- GNU Octave
-- KiCad
-- OpenRocket
-
 ---
 
-# Software Workflow
+## Current Development Stage
 
-Virtual Sensors
+Software Simulation (Version 1)
 
-↓
-
-Flight Computer
-
-↓
-
-Telemetry Engine
-
-↓
-
-Ground Station
-
-↓
-
-Health Monitoring
-
-↓
-
-Mission Report
-
----
-
-# Current Version
-
-Version : 1.2
-
-Status :
-
-Software Simulation Complete
-
----
-
-# Development Roadmap
-
-## Version 1
-
-Software Simulation
-
-- Virtual Sensors
-- Flight Computer
-- Telemetry
-- Ground Station
-- Health Monitor
-
----
-
-## Version 2
-
-Embedded Firmware
-
-- STM32CubeIDE
-- UART
-- GPIO
-- ADC
-- Timers
-- Interrupts
-- HAL Drivers
-
----
-
-## Version 3
-
-Communication Systems
-
-- Telemetry Protocols
-- Serial Communication
-- Packet Validation
-- Error Detection
-
----
-
-## Version 4
-
-Signal Processing
-
-- Sensor Filtering
-- FFT
-- Kalman Filter
-- GNU Octave
-
----
-
-## Version 5
-
-Hardware Design
-
-- KiCad PCB
-- STM32 Board
-- Power System
-- Sensors
-
----
-
-## Version 6
-
-OpenRocket Integration
-
-- Flight Simulation
-- Trajectory Analysis
-- Mission Replay
-
----
-
-# Learning Outcomes
-
-This project focuses on understanding:
-
-- Embedded Systems
-- Aerospace Software
-- Flight Computers
-- Telemetry Systems
-- Communication Systems
-- System Validation
+Completed:
 - Software Architecture
-- Engineering Documentation
+- Core Mission Pipeline
+- Logging
+- Testing
+- Fault Management
+
+Upcoming:
+- STM32CubeIDE Embedded Firmware
+- GNU Octave Signal Processing
+- OpenRocket Mission Integration
+- Hardware Prototype
 
 ---
 
-# License
+## Future Roadmap
 
-This project is licensed under the MIT License.
+- Embedded C Firmware
+- STM32 HAL Drivers
+- UART Telemetry
+- Timer Interrupts
+- Sensor Interfaces
+- RTOS Concepts
+- Signal Processing
+- Hardware Integration
 
 ---
 
-# Author
+## License
 
-SaiPrabha C Y
-
-Electronics and Communication Engineering
-
-Embedded Systems | Aerospace | Communication Systems
+This project is released under the MIT License.
