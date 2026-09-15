@@ -1,0 +1,7 @@
+../Core/Src/telemetry.c:5:13:write_u16_le	1
+../Core/Src/telemetry.c:11:13:write_u32_le	1
+../Core/Src/telemetry.c:19:17:float_to_u16	2
+../Core/Src/telemetry.c:29:17:telemetry_crc16	4
+../Core/Src/telemetry.c:53:6:telemetry_init	1
+../Core/Src/telemetry.c:58:10:telemetry_build_packet	4
+../Core/Src/telemetry.c:123:9:telemetry_verify_packet	7

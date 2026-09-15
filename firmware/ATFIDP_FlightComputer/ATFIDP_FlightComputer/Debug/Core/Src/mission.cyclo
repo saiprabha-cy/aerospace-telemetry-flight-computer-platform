@@ -1,0 +1,2 @@
+../Core/Src/mission.c:4:6:mission_init	1
+../Core/Src/mission.c:9:6:mission_run	1

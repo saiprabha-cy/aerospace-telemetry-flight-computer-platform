@@ -1,0 +1,2 @@
+../Core/Src/telemetry_uart.c:8:6:telemetry_uart_init	1
+../Core/Src/telemetry_uart.c:13:9:telemetry_uart_send	4

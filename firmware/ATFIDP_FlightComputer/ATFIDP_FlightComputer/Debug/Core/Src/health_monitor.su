@@ -1,0 +1,2 @@
+../Core/Src/health_monitor.c:5:6:health_monitor_init	8	static
+../Core/Src/health_monitor.c:10:6:health_monitor_update	16	static

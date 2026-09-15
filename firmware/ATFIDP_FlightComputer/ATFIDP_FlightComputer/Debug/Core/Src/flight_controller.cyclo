@@ -1,0 +1,2 @@
+../Core/Src/flight_controller.c:5:6:flight_controller_init	1
+../Core/Src/flight_controller.c:10:6:flight_controller_update	2

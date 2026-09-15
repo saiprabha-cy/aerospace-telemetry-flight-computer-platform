@@ -1,0 +1,2 @@
+../Core/Src/sensor.c:5:6:sensor_init	1
+../Core/Src/sensor.c:10:6:sensor_update	2

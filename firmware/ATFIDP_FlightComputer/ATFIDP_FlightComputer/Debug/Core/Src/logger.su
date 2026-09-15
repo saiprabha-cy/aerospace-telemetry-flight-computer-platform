@@ -1,0 +1,4 @@
+../Core/Src/logger.c:5:6:logger_init	8	static
+../Core/Src/logger.c:10:6:logger_info	16	static
+../Core/Src/logger.c:15:6:logger_log	16	static
+../Core/Src/logger.c:20:6:logger_hex_dump	24	static

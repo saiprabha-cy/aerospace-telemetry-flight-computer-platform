@@ -1,0 +1,2 @@
+../Core/Src/scheduler.c:12:6:scheduler_init	8	static
+../Core/Src/scheduler.c:17:6:scheduler_run	24	static
