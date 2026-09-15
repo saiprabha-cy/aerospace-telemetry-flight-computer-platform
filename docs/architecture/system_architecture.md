@@ -2,315 +2,403 @@
 
 ## 1. Purpose
 
-The Aerospace Telemetry, Flight Computer & Instrumentation Development Platform (ATFIDP) is an integrated engineering platform for developing and verifying flight-computer, telemetry, instrumentation, simulation, and mission-support software.
+The Aerospace Telemetry, Flight Computer & Instrumentation Development Platform (ATFIDP) is structured as an integrated engineering environment for developing and verifying a small flight-computer and telemetry system.
 
 The architecture connects:
 
-- Flight-data generation
-- Health monitoring
-- Flight-control software
-- Mission execution
-- Telemetry packet generation
-- UART telemetry transmission
-- MATLAB simulation
-- Simulink execution
-- OpenRocket trajectory data
+- STM32 embedded firmware
+- Flight-data and health-management logic
+- Telemetry packet generation and verification
+- UART transport
+- MATLAB flight-data simulation
+- Simulink system-level modeling
+- OpenRocket trajectory simulation
 - Python host-side telemetry verification
 
-The project is designed as a development and verification platform rather than a flight-qualified avionics system.
+The project follows an engineering flow of:
+
+**Model → Simulate → Implement → Generate Telemetry → Verify → Cross-Validate**
 
 ---
 
-## 2. System-Level Architecture
+## 2. System Overview
 
 ```text
                          ATFIDP SYSTEM
                               │
-              ┌───────────────┴───────────────┐
-              │                               │
-       FLIGHT COMPUTER                  ENGINEERING MODELS
-              │                               │
-       ┌──────┼────────┐              ┌───────┼──────────┐
-       │      │        │              │       │          │
-    Sensor  Health   Mission       MATLAB  Simulink  OpenRocket
-       │    Monitor  Manager          │       │          │
-       │      │        │              │       │          │
-       └──────┴────────┘              └───────┴──────────┘
-              │                               │
-              ▼                               ▼
-       Flight Controller               Simulation Data
-              │
-              ▼
-       Telemetry Builder
-              │
-       ┌──────┴─────────┐
-       │                │
-   CRC Verification   Packet
-       │                │
-       └──────┬─────────┘
-              ▼
-        UART Interface
-              │
-              ▼
-       External Telemetry
-              │
-              ▼
-     Host-Side Verification
-            Python
-            
-## 3. Flight-Computer Software Architecture
+          ┌───────────────────┼───────────────────┐
+          │                   │                   │
+          ▼                   ▼                   ▼
+       MATLAB             OpenRocket            STM32
+     Simulation           Trajectory       Flight Computer
+          │                   │                   │
+          │                   ▼                   │
+          │               CSV Data                 │
+          │                   │                   │
+          │                   ▼                   │
+          │                MATLAB                  │
+          │               Preparation              │
+          │                   │                   │
+          │                   ▼                   │
+          │                Simulink                │
+          │                   │                   │
+          └───────────────────┼───────────────────┘
+                              │
+                              ▼
+                       Cross-Validation
+                              │
+                              ▼
+                          Telemetry
+                              │
+                              ▼
+                            UART
+                              │
+                              ▼
+                      Host Verification
+```
 
-The embedded software is organized into modular components.
+The three major engineering domains are:
 
-main
- │
- ├── Hardware Initialization
- │
- ├── Logger
- ├── Sensor
- ├── Health Monitor
- ├── Flight Controller
- ├── Mission Manager
- ├── Telemetry
- ├── Telemetry UART
- └── Scheduler
+1. **Embedded flight-computer implementation**
+2. **MATLAB/Simulink system modeling**
+3. **OpenRocket trajectory generation and integration**
 
-The scheduler provides the main software execution path.
+Python provides an independent host-side verification path for the telemetry packet format.
 
-Scheduler
-   │
-   ├── Sensor Update
-   │
-   ├── Timestamp Update
-   │
-   ├── Health Monitoring
-   │
-   ├── Flight Controller Update
-   │
-   ├── Mission Execution
-   │
-   ├── Telemetry Packet Construction
-   │
-   ├── CRC Verification
-   │
-   └── UART Transmission
+---
 
+## 3. Major Components
 
-## 4. Flight Data Flow
+| Component | Responsibility |
+|---|---|
+| Sensor Module | Provides flight-data inputs to the flight-computer data structure |
+| Health Monitor | Evaluates basic vehicle health conditions |
+| Flight Controller | Provides the flight-control processing interface |
+| Mission Manager | Provides mission-execution logic |
+| Scheduler | Controls the periodic execution sequence |
+| Telemetry Module | Builds and verifies telemetry packets |
+| UART Interface | Provides the embedded telemetry transport |
+| MATLAB | Generates deterministic flight scenarios and performs analysis |
+| Simulink | Provides system-level simulation and signal-flow verification |
+| OpenRocket | Generates a reference rocket trajectory |
+| Python Verifier | Independently validates the telemetry packet format and CRC |
 
-The common FlightData structure acts as the internal data model.
+---
 
-Sensor Data
-    │
-    ▼
-FlightData
-    │
-    ├── Temperature
-    ├── Altitude
-    ├── Velocity
-    ├── Battery Voltage
-    ├── Timestamp
-    └── Health Status
-         │
-         ├── Health Monitor
-         │
-         ├── Flight Controller
-         │
-         └── Telemetry Builder
+## 4. Embedded Flight-Computer Architecture
 
-This avoids unnecessary coupling between individual software modules.
+The embedded implementation targets an **STM32F446RETx** microcontroller using STM32CubeMX-generated initialization and STM32 HAL interfaces.
 
-## 5. Telemetry Data Flow
+```text
+                    STM32F446RETx
+                          │
+                          ▼
+                       main.c
+                          │
+                          ▼
+                     Scheduler
+                          │
+        ┌─────────────────┼─────────────────┐
+        │                 │                 │
+        ▼                 ▼                 ▼
+     Sensor         Health Monitor    Flight Controller
+        │                 │                 │
+        └─────────────────┼─────────────────┘
+                          │
+                          ▼
+                    Mission Manager
+                          │
+                          ▼
+                      Telemetry
+                          │
+                 ┌────────┴────────┐
+                 │                 │
+                 ▼                 ▼
+          Packet Verification     CRC-16
+                 │
+                 ▼
+             USART2 / UART
+```
 
-FlightData
-    │
-    ▼
-Telemetry Builder
-    │
-    ├── Sync
-    ├── Version
-    ├── Sequence
-    ├── Timestamp
-    ├── Sensor Values
-    ├── Status
-    └── CRC16
-    │
-    ▼
-22-byte Packet
-    │
-    ▼
-Packet Verification
-    │
-    ├── PASS ──► UART
-    │
-    └── FAIL ──► Reject
-## 6. Simulation Architecture
+The scheduler provides the main application sequence:
 
-The engineering simulation environment provides an independent model of the flight-computer data path.
+```text
+Sensor Update
+      │
+      ▼
+Timestamp Update
+      │
+      ▼
+Health Monitoring
+      │
+      ▼
+Flight Controller Update
+      │
+      ▼
+Mission Manager
+      │
+      ▼
+Telemetry Packet Construction
+      │
+      ▼
+Telemetry Packet Verification
+      │
+      ▼
+UART Transmission
+```
 
-MATLAB
-  │
-  ├── Flight Scenario Generation
-  │
-  ├── Health Model
-  │
-  └── Simulation Dataset
+The current implementation uses deterministic simulated sensor values. The architecture is intentionally structured so that these inputs can later be replaced by real sensor interfaces.
+
+---
+
+## 5. Runtime Data Flow
+
+The primary flight-data object is the `FlightData` structure.
+
+```text
+Sensor Inputs
+     │
+     ▼
+ FlightData
+     │
+     ├── Temperature
+     ├── Altitude
+     ├── Velocity
+     ├── Battery Voltage
+     ├── Timestamp
+     └── Status
           │
           ▼
-      Simulink
+   Health Monitoring
           │
           ▼
-   Model Execution
+   Flight Processing
+          │
+          ▼
+   Mission Processing
+          │
+          ▼
+ Telemetry Serialization
+          │
+          ▼
+     CRC-16
+          │
+          ▼
+    UART Transport
+```
 
-OpenRocket provides a separate trajectory source:
+This separates data acquisition, health evaluation, mission processing, telemetry serialization, and transport responsibilities.
 
-OpenRocket
-    │
-    ▼
-CSV Flight Data
-    │
-    ▼
-MATLAB Import
-    │
-    ▼
-Data Cleaning
-    │
-    ▼
-MATLAB Timeseries
-    │
-    ▼
-Simulink
+---
 
+## 6. Telemetry Interface
 
-## 7. Verification Architecture
+The embedded telemetry subsystem generates a fixed **22-byte binary packet**.
 
-The platform uses multiple verification layers.
+```text
+┌────────┬─────────┬──────────┬───────────┬──────────────┬────────┐
+│ Sync   │ Version │ Sequence │ Timestamp │ Flight Data  │ CRC-16 │
+│ 2 B    │ 1 B     │ 4 B      │ 4 B       │ 9 B          │ 2 B    │
+└────────┴─────────┴──────────┴───────────┴──────────────┴────────┘
+```
 
-Layer 1 — Source-level verification
+The packet contains:
 
-Embedded C modules are compiled as part of the STM32 firmware project.
+- Synchronization word
+- Protocol version
+- Sequence counter
+- Timestamp
+- Temperature
+- Altitude
+- Velocity
+- Battery voltage
+- Flight status
+- CRC-16
 
-Layer 2 — Firmware build verification
+Packet construction and verification are implemented independently within the embedded telemetry module.
 
-The complete STM32 firmware is compiled using STM32CubeIDE/GCC.
+The complete field-level packet definition is documented separately in:
 
-Layer 3 — Telemetry verification
+`docs/telemetry/telemetry_protocol.md`
 
-The generated telemetry packet is independently checked using Python.
+---
 
-Layer 4 — MATLAB verification
+## 7. Engineering-Time Architecture
 
-The flight-data generation and health-monitoring model are executed independently.
+The project also contains an engineering-time simulation and verification chain.
 
-Layer 5 — Simulink verification
+### MATLAB Flight Simulation
 
-The Simulink models are executed to verify model behavior.
+```text
+Simulation Parameters
+        │
+        ▼
+Deterministic Flight Scenario
+        │
+        ▼
+Flight Data Generation
+        │
+        ▼
+Health Monitoring Model
+        │
+        ▼
+Simulation Results
+        │
+        ▼
+MAT File
+```
 
-Layer 6 — OpenRocket verification
+### OpenRocket → MATLAB → Simulink
 
-Reference trajectory values are extracted from OpenRocket.
+```text
+             OpenRocket
+                 │
+                 ▼
+        Reference Flight CSV
+                 │
+                 ▼
+       MATLAB Data Preparation
+                 │
+                 ▼
+          Cleaned Trajectory
+                 │
+                 ▼
+             Timeseries
+                 │
+                 ▼
+             Simulink
+                 │
+                 ▼
+        System-Level Analysis
+                 │
+                 ▼
+        Cross-Validation
+```
 
-Layer 7 — Cross-tool verification
+This provides an independent trajectory source for checking the Simulink integration.
 
-OpenRocket trajectory data is compared against the Simulink representation.
+---
 
-## 8. Engineering Boundaries
+## 8. Interfaces
 
-ATFIDP currently demonstrates:
+| Interface | Purpose |
+|---|---|
+| `FlightData` | Common internal representation of flight state |
+| Telemetry Packet | Binary representation of flight data for transmission |
+| CRC-16 | Detects corruption in the telemetry packet |
+| USART2 | Embedded telemetry transport interface |
+| OpenRocket CSV | External trajectory-data interface |
+| MATLAB Timeseries | Data interface between MATLAB preparation and Simulink |
+| Python Telemetry Verifier | Independent host-side packet validation |
 
-Embedded C architecture
-STM32 HAL integration
-UART telemetry interface
-Binary telemetry packet construction
-CRC16 verification
-Host-side packet verification
-MATLAB simulation
-Simulink execution
-OpenRocket trajectory integration
-Automated cross-tool verification
+The interfaces are kept explicit so that individual modules can be tested without requiring the complete system.
 
-The project does not claim:
+---
 
-Flight qualification
-Hardware-in-the-loop qualification
-Radiation tolerance
-EMC/EMI qualification
-Real sensor electrical validation
-Physical UART link validation
-Flight certification
+## 9. Verification Boundary
 
+The architecture supports verification at multiple levels.
 
-## 9. Target Hardware
+```text
+                 ATFIDP Verification
+                         │
+        ┌────────────────┼────────────────┐
+        │                │                │
+        ▼                ▼                ▼
+     Firmware          Models         Integration
+        │                │                │
+        ▼                ▼                ▼
+   Build Check      MATLAB Check     OpenRocket Check
+   Module Logic     Simulink Check   Simulink Check
+   Telemetry        Data Check       Cross-Validation
+   CRC              Health Logic
+        │                │                │
+        └────────────────┼────────────────┘
+                         ▼
+                 System Evidence
+```
 
-The firmware project targets:
+Verified areas include:
 
-STM32F446RETx
+- STM32 firmware compilation
+- Embedded module integration
+- Telemetry packet construction
+- CRC verification
+- MATLAB flight simulation
+- Simulink execution
+- OpenRocket trajectory processing
+- OpenRocket-to-Simulink data consistency
+- Python host-side telemetry verification
+- Automated MATLAB/OpenRocket/Simulink integration verification
 
-The project uses STM32CubeMX-generated peripheral configuration and STM32 HAL APIs.
+The final MATLAB/OpenRocket integration verification completed with:
 
-USART2 is configured for telemetry communication.
+**15 tests passed, 0 failed.**
 
-Current firmware configuration:
+---
 
-Baud rate: 115200
-Data bits: 8
-Parity: None
-Stop bits: 1
-TX/RX enabled
+## 10. Hardware Boundary
 
-The firmware has been successfully built.
+The embedded architecture targets:
 
-Physical UART transmission has not been electrically verified because the required hardware was not available during development.
+**MCU:** STM32F446RETx  
+**UART:** USART2  
+**Configuration:** 115200 baud, 8-N-1
 
-## 10. Repository-Level Architecture
-ATFIDP/
-│
-├── architecture/
-├── config/
-├── docs/
-├── fault_management/
-├── flight_computer/
-├── ground_station/
-├── health_monitor/
-├── mission_control/
-├── mission_scheduler/
-├── mission_timeline/
-├── models/
-├── simulations/
-├── state_machine/
-├── telemetry/
-├── tests/
-├── utils/
-│
-├── firmware/
-│   └── ATFIDP_FlightComputer/
-│
-├── matlab/
-│   └── flight_computer_model/
-│
-├── openrocket/
-│   ├── designs/
-│   └── simulations/
-│
-├── CHANGELOG.md
-├── LICENSE
-├── README.md
-├── VERSION.md
-└── requirements.txt
+The firmware configuration, peripheral initialization, packet construction, CRC verification, and UART transmission code have been implemented and successfully compiled.
 
-## 11. Architectural Objective
+Physical UART electrical transmission has **not** been verified because physical STM32 hardware and an external UART receiver were not available during development.
 
-The primary architectural objective is separation of concerns.
+Therefore, the project distinguishes between:
 
-The system separates:
+- **Software/peripheral integration:** implemented and build-verified
+- **Physical electrical transmission:** not yet experimentally verified
 
-Flight-data acquisition
-Health assessment
-Control logic
-Mission execution
-Telemetry construction
-Communications
-Simulation
-Verification
+---
 
-This structure allows individual components to be developed, tested, replaced, and extended without restructuring the complete platform.
+## 11. Architectural Scope
+
+The current architecture establishes a foundation for future aerospace-oriented extensions, including:
+
+- Real sensor drivers
+- IMU and GPS interfaces
+- Additional communication interfaces
+- Telecommand handling
+- Watchdog supervision
+- Fault recovery
+- Expanded mission state machines
+- CCSDS-compatible telemetry
+- RF transceiver integration
+- Hardware-in-the-loop testing
+- Real-time hardware validation
+
+These are future extensions rather than claims of functionality in the current implementation.
+
+---
+
+## 12. Summary
+
+ATFIDP uses a layered architecture that connects embedded implementation with system-level modeling and independent verification.
+
+```text
+       MODEL
+         │
+         ▼
+     SIMULATE
+         │
+         ▼
+    IMPLEMENT
+         │
+         ▼
+GENERATE TELEMETRY
+         │
+         ▼
+      VERIFY
+         │
+         ▼
+ CROSS-VALIDATE
+```
+
+The resulting architecture provides a traceable path from flight-data modeling to embedded telemetry implementation and system-level verification.
+
+The project therefore serves as an integrated development and verification platform rather than a standalone firmware or simulation exercise.
