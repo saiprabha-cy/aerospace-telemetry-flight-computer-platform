@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="ATFIDP — Aerospace Telemetry, Flight Computer & Instrumentation Development Platform engineering report.">
+<title>ATFIDP — Aerospace Telemetry, Flight Computer & Instrumentation Development Platform</title>
+<style>
+:root{
+  --bg:#06090d;--panel:#0b1118;--panel2:#0e1620;--line:#1b2a36;
+  --text:#e8f1f5;--muted:#8ca1ad;--cyan:#38d9ff;--cyan2:#83edff;
+  --green:#59e391;--amber:#ffbf69;--red:#ff6f7d;--purple:#a98cff;
+  --mono:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
+  --sans:"Space Grotesk",Inter,system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);
+  background-image:linear-gradient(rgba(56,217,255,.025) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(56,217,255,.025) 1px,transparent 1px);
+  background-size:36px 36px;
+}
+body:before{
+  content:"";position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 70% 5%,rgba(56,217,255,.09),transparent 28%),
+             radial-gradient(circle at 15% 55%,rgba(89,227,145,.035),transparent 25%);
+}
+a{color:inherit}
+.rail{
+  position:fixed;left:0;top:0;bottom:0;width:235px;border-right:1px solid var(--line);
+  background:rgba(6,9,13,.92);backdrop-filter:blur(14px);z-index:20;padding:26px 18px;
+}
+.brand{font:700 15px var(--mono);letter-spacing:.13em;color:var(--cyan);margin-bottom:5px}
+.brand-sub{font:11px var(--mono);color:var(--muted);line-height:1.5;margin-bottom:35px}
+.nav{display:grid;gap:7px}
+.nav a{
+  text-decoration:none;padding:10px 11px;border:1px solid transparent;border-radius:7px;
+  color:var(--muted);font:11px var(--mono);letter-spacing:.04em;transition:.2s;
+}
+.nav a:hover,.nav a.active{border-color:#234250;background:#0b171e;color:var(--cyan)}
+.rail-foot{
+  position:absolute;left:18px;right:18px;bottom:22px;font:9px var(--mono);
+  color:#536873;line-height:1.65
+}
+main{margin-left:235px}
+section,.hero{max-width:1260px;margin:auto;padding:96px 58px}
+.hero{min-height:100vh;display:grid;grid-template-columns:1.12fr .88fr;gap:55px;align-items:center;padding-top:72px}
+.kicker{font:11px var(--mono);letter-spacing:.2em;color:var(--cyan);text-transform:uppercase}
+h1{font-size:clamp(44px,5.2vw,78px);line-height:.94;letter-spacing:-.055em;margin:18px 0 25px;max-width:850px}
+.hero p{font-size:17px;line-height:1.75;color:#b5c4ca;max-width:760px}
+.hero-note{font:11px var(--mono);color:var(--muted);margin-top:22px}
+.readouts{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:35px}
+.readout{border:1px solid var(--line);background:rgba(11,17,24,.78);padding:15px;border-radius:7px}
+.readout b{display:block;font:700 19px var(--mono);color:var(--text)}
+.readout span{display:block;font:9px var(--mono);color:var(--muted);margin-top:7px;line-height:1.4}
+.hero-art{min-height:570px;display:grid;place-items:center;position:relative}
+.orbit{width:430px;height:430px;border:1px solid #1a3946;border-radius:50%;position:absolute}
+.orbit:before,.orbit:after{content:"";position:absolute;inset:28px;border:1px dashed #17313d;border-radius:50%}
+.orbit:after{inset:105px;border-style:solid;opacity:.55}
+.rocket{width:210px;position:relative;z-index:2;filter:drop-shadow(0 0 25px rgba(56,217,255,.16))}
+.rocket-body{fill:#dce7eb}.rocket-dark{fill:#6f858e}.rocket-window{fill:#07141b;stroke:var(--cyan);stroke-width:3}
+.flame{fill:var(--amber);transform-origin:50% 0;animation:flame .16s infinite alternate}
+.flame2{fill:var(--red);transform-origin:50% 0;animation:flame .11s infinite alternate-reverse}
+@keyframes flame{to{transform:scaleY(1.28) scaleX(.82)}}
+.hud{position:absolute;inset:0;pointer-events:none}
+.hud span{position:absolute;font:9px var(--mono);color:#5f8591}
+.h1{top:18%;left:4%}.h2{top:29%;right:1%}.h3{bottom:24%;left:0}.h4{bottom:11%;right:4%}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:35px}
+.section-no{font:10px var(--mono);color:var(--cyan);letter-spacing:.15em}
+h2{font-size:clamp(32px,4vw,52px);letter-spacing:-.045em;margin:8px 0 0}
+.lead{max-width:680px;color:var(--muted);line-height:1.7;font-size:15px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{
+  border:1px solid var(--line);background:linear-gradient(145deg,rgba(14,22,32,.94),rgba(7,12,17,.94));
+  border-radius:9px;padding:22px;
+}
+.card h3{margin:0 0 11px;font-size:16px}.card p{margin:0;color:var(--muted);line-height:1.65;font-size:13px}
+.card .tag{font:9px var(--mono);color:var(--cyan);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.callout{border-left:2px solid var(--amber);padding:15px 18px;background:#11130f;color:#bfc6bd;font-size:13px;line-height:1.7;margin-top:18px}
+.arch-shell{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(300px,.7fr);gap:18px}
+.arch{
+  border:1px solid var(--line);border-radius:10px;background:#070d12;padding:20px;position:relative;
+  overflow:hidden;min-height:670px;
+}
+.arch-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(56,217,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(56,217,255,.035) 1px,transparent 1px);background-size:28px 28px}
+.stack{position:relative;z-index:2;max-width:640px;margin:18px auto}
+.band{
+  position:relative;margin:8px 0;border:1px solid #284451;border-radius:7px;padding:16px 17px;
+  background:linear-gradient(90deg,#0b171e,#0a1117);cursor:pointer;transition:.22s;overflow:hidden;
+}
+.band:hover{transform:translateX(4px);border-color:var(--cyan)}
+.band.selected{border-color:var(--cyan);box-shadow:0 0 0 1px rgba(56,217,255,.18),0 0 25px rgba(56,217,255,.06)}
+.band .label{font:9px var(--mono);color:var(--cyan);letter-spacing:.13em}
+.band h3{margin:5px 0 3px;font-size:16px}.band p{margin:0;color:#718792;font-size:11px}
+.band:after{content:"";position:absolute;left:0;right:0;top:-2px;height:2px;background:var(--cyan);transform:translateX(-105%);opacity:.7}
+.band.pulse:after{animation:sweep .75s ease}
+@keyframes sweep{to{transform:translateX(105%)}}
+.connector{height:19px;width:2px;background:#25414d;margin:auto;position:relative}
+.connector:after{content:"";position:absolute;left:50%;bottom:0;transform:translate(-50%,50%);border:4px solid transparent;border-top-color:#4c6974}
+.side-path{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px auto 0;max-width:640px}
+.path{
+  border:1px dashed #25414d;border-radius:7px;padding:13px;cursor:pointer;background:#091219;
+  transition:.2s
+}
+.path:hover{border-color:var(--purple);transform:translateY(-2px)}
+.path b{font:10px var(--mono);color:var(--purple);display:block}.path span{font-size:11px;color:var(--muted);display:block;margin-top:5px}
+.trace{
+  margin:20px auto 0;max-width:640px;border-top:1px solid #1a303a;padding-top:15px;
+  display:flex;justify-content:space-between;align-items:center;gap:10px
+}
+.trace small{font:9px var(--mono);color:var(--muted)}
+button{
+  font:10px var(--mono);color:var(--cyan);background:#0b171e;border:1px solid #28505f;
+  border-radius:5px;padding:9px 12px;cursor:pointer
+}
+button:hover{background:#10222b;border-color:var(--cyan)}
+.detail{
+  border:1px solid var(--line);background:#0b1219;border-radius:10px;padding:24px;
+  min-height:670px;position:sticky;top:22px
+}
+.detail .tag{font:9px var(--mono);color:var(--cyan);text-transform:uppercase;letter-spacing:.13em}
+.detail h3{font-size:25px;margin:9px 0 14px}.detail p{color:var(--muted);line-height:1.75;font-size:13px}
+.detail pre{white-space:pre-wrap;border:1px solid #172a34;background:#070c11;border-radius:6px;padding:14px;color:#9db8c2;font:10px/1.65 var(--mono);overflow:auto}
+.status{display:inline-flex;gap:7px;align-items:center;font:9px var(--mono);color:var(--green);margin-top:15px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}
+.verif-flow{margin-top:18px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.node{border:1px solid #24404b;border-radius:5px;padding:8px 9px;font:9px var(--mono);color:#9bb0b8;background:#091219}
+.arrow{color:var(--cyan);font:12px var(--mono)}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:8px}
+table{width:100%;border-collapse:collapse;min-width:680px}
+th,td{text-align:left;padding:13px 15px;border-bottom:1px solid #182832;font-size:11px}
+th{font:9px var(--mono);color:var(--cyan);letter-spacing:.08em;background:#091219}
+td{color:#b9c7cd}tr:last-child td{border-bottom:0}.pass{color:var(--green);font-family:var(--mono)}
+.metric-big{font:700 38px var(--mono);color:var(--cyan);margin:6px 0}.metric-label{font:10px var(--mono);color:var(--muted)}
+.logs{display:grid;gap:10px}
+.log{display:grid;grid-template-columns:110px 1fr;gap:18px;border:1px solid var(--line);background:#091017;border-radius:7px;padding:17px}
+.log code{font:10px var(--mono);color:var(--amber)}.log p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.65}
+.topic-group{border-top:1px solid var(--line);padding:22px 0}.topic-group:first-child{border-top:0}
+.topic-group h3{margin:0 0 13px;font-size:15px}.chips{display:flex;gap:7px;flex-wrap:wrap}
+.chip{border:1px solid #24404b;background:#091219;color:#9eb1b9;border-radius:4px;padding:7px 9px;font:9px var(--mono)}
+.chip.master{border-color:#55452d;color:#d5b77f;background:#11100b}
+.repo{
+  display:flex;justify-content:space-between;align-items:center;gap:20px;text-decoration:none;
+  border:1px solid var(--line);background:#091017;padding:19px;border-radius:8px;transition:.2s
+}
+.repo:hover{border-color:var(--cyan);transform:translateY(-2px)}.repo b{font-size:14px}.repo span{font:9px var(--mono);color:var(--muted)}
+.repo-grid{display:grid;gap:9px}
+.footer{border-top:1px solid var(--line);padding:30px 58px 45px;color:#526872;font:9px var(--mono);max-width:1260px;margin:auto;line-height:1.8}
+.pulse-line{position:absolute;height:2px;background:var(--cyan);box-shadow:0 0 12px var(--cyan);width:90px;top:50%;left:-110px;opacity:0}
+.pulse-line.run{animation:travel 1.5s linear infinite}
+@keyframes travel{0%{left:-110px;opacity:0}15%{opacity:1}100%{left:100%;opacity:0}}
+@media(max-width:1000px){
+  .rail{position:relative;width:100%;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:15px}
+  .brand-sub,.rail-foot{display:none}.nav{display:flex;overflow:auto}.nav a{white-space:nowrap}
+  main{margin-left:0}.hero{grid-template-columns:1fr;padding-top:65px}.hero-art{min-height:420px}
+  section,.hero{padding-left:25px;padding-right:25px}.arch-shell,.grid2{grid-template-columns:1fr}.detail{position:relative;top:0;min-height:auto}.readouts{grid-template-columns:1fr 1fr}
+}
+@media(max-width:620px){
+  h1{font-size:42px}.grid3{grid-template-columns:1fr}.readouts{grid-template-columns:1fr 1fr}
+  .orbit{width:300px;height:300px}.rocket{width:155px}.hero-art{min-height:340px}
+  .side-path{grid-template-columns:1fr}.log{grid-template-columns:1fr;gap:4px}.footer{padding-left:25px;padding-right:25px}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}.flame,.flame2,.band:after,.pulse-line.run{animation:none!important}
+  *{transition:none!important}
+}
+</style>
+</head>
+<body>
+<aside class="rail">
+  <div class="brand">ATFIDP / REPORT</div>
+  <div class="brand-sub">AEROSPACE TELEMETRY<br>FLIGHT COMPUTER<br>& INSTRUMENTATION</div>
+  <nav class="nav">
+    <a href="#overview">01 · Overview</a>
+    <a href="#architecture">02 · Architecture</a>
+    <a href="#engineering">03 · Engineering</a>
+    <a href="#verification">04 · Verification</a>
+    <a href="#log">05 · Engineering Log</a>
+    <a href="#knowledge">06 · Knowledge Domains</a>
+    <a href="#portfolio">07 · Portfolio</a>
+  </nav>
+  <div class="rail-foot">SOFTWARE-FIRST ENGINEERING PLATFORM<br>NOT FLIGHT-QUALIFIED AVIONICS<br><br>STATUS · INTEGRATED / VERIFIED</div>
+</aside>
+
+<main>
+<header class="hero" id="overview">
+  <div>
+    <div class="kicker">Flight Computer Report · ATFIDP</div>
+    <h1>Aerospace Telemetry, Flight Computer & Instrumentation Development Platform</h1>
+    <p>
+      A software-first embedded aerospace platform that connects flight-state data,
+      health monitoring, mission logic, binary telemetry, CRC verification, STM32 firmware,
+      MATLAB/Simulink simulation, OpenRocket trajectory data and independent host-side verification.
+    </p>
+    <div class="hero-note">DESIGN INTENT · MODEL → IMPLEMENT → VERIFY → CROSS-VALIDATE</div>
+    <div class="readouts">
+      <div class="readout"><b>22 B</b><span>TELEMETRY PACKET</span></div>
+      <div class="readout"><b>0 / 0</b><span>FIRMWARE ERRORS / WARNINGS</span></div>
+      <div class="readout"><b>15 / 15</b><span>INTEGRATION TESTS PASSED</span></div>
+      <div class="readout"><b>PASS</b><span>CRC + TRAJECTORY CHECK</span></div>
+    </div>
+  </div>
+  <div class="hero-art" aria-label="Animated aerospace rocket visualization">
+    <div class="orbit"></div>
+    <div class="hud">
+      <span class="h1">FCU / TELEMETRY</span>
+      <span class="h2">UART 115200 · 8-N-1</span>
+      <span class="h3">CRC-16 / PACKET 22 B</span>
+      <span class="h4">SIL / CROSS-VALIDATION</span>
+    </div>
+    <svg class="rocket" viewBox="0 0 180 360" role="img" aria-label="Stylized rocket">
+      <path class="flame" d="M72 285 Q90 320 108 285 L100 350 Q90 365 80 350Z"/>
+      <path class="flame2" d="M82 286 Q90 309 98 286 L94 335 Q90 344 86 335Z"/>
+      <path class="rocket-dark" d="M53 265 L34 290 L58 286 L68 266Z"/>
+      <path class="rocket-dark" d="M127 265 L146 290 L122 286 L112 266Z"/>
+      <path class="rocket-body" d="M90 18 C65 45 52 78 52 125 L52 267 Q90 285 128 267 L128 125 C128 78 115 45 90 18Z"/>
+      <path class="rocket-dark" d="M53 216 L127 216 L127 267 Q90 284 53 267Z"/>
+      <circle class="rocket-window" cx="90" cy="112" r="24"/>
+      <circle cx="90" cy="112" r="9" fill="#38d9ff" opacity=".7"/>
+      <rect x="69" y="158" width="42" height="30" rx="3" fill="#09151b" stroke="#3b6674"/>
+      <path d="M74 166h32M74 173h24M74 180h29" stroke="#59e391" stroke-width="2"/>
+      <path d="M90 18V267" stroke="#6f858e" stroke-width="2" opacity=".55"/>
+    </svg>
+  </div>
+</header>
+
+<section id="architecture">
+  <div class="section-head">
+    <div><div class="section-no">02 / ARCHITECTURE</div><h2>One flight-computer path. Multiple verification paths.</h2></div>
+    <p class="lead">Click a subsystem to inspect its engineering role. Use <b>TRACE DATA FLOW</b> to animate the primary software path.</p>
+  </div>
+
+  <div class="arch-shell">
+    <div class="arch">
+      <div class="arch-grid"></div>
+      <div class="stack">
+        <div class="band selected" data-id="flightdata"><div class="label">01 · FLIGHT DATA</div><h3>Instrumentation / Flight-State Model</h3><p>Temperature · altitude · velocity · battery · timestamp · status</p></div>
+        <div class="connector"></div>
+        <div class="band" data-id="health"><div class="label">02 · HEALTH MONITOR</div><h3>Fault / Health Evaluation</h3><p>Threshold checks → OK / WARNING / CRITICAL</p></div>
+        <div class="connector"></div>
+        <div class="band" data-id="flight"><div class="label">03 · FLIGHT LOGIC</div><h3>Scheduler · Flight Controller · Mission</h3><p>Periodic execution and modular mission logic</p></div>
+        <div class="connector"></div>
+        <div class="band" data-id="telemetry"><div class="label">04 · TELEMETRY</div><h3>Binary Packet Builder</h3><p>22-byte fixed layout · scaling · little-endian serialization</p></div>
+        <div class="connector"></div>
+        <div class="band" data-id="transport"><div class="label">05 · TRANSPORT</div><h3>UART Telemetry Interface</h3><p>USART2 · 115200 · 8-N-1 · software transmission path</p></div>
+        <div class="connector"></div>
+        <div class="band" data-id="crosscheck"><div class="label">06 · VERIFICATION</div><h3>Host + Simulation Cross-Check</h3><p>Python · MATLAB · Simulink · OpenRocket</p></div>
+
+        <div class="side-path">
+          <div class="path" data-id="python"><b>HOST VERIFY</b><span>Independent Python packet decoder + CRC checker</span></div>
+          <div class="path" data-id="matlab"><b>NUMERICAL MODEL</b><span>MATLAB deterministic flight-state simulation</span></div>
+          <div class="path" data-id="simulink"><b>SYSTEM MODEL</b><span>Fixed-step Simulink health / flight-computer model</span></div>
+          <div class="path" data-id="openrocket"><b>REFERENCE TRAJECTORY</b><span>OpenRocket → CSV → MATLAB → Simulink</span></div>
+        </div>
+        <div class="trace">
+          <small id="traceState">READY · PRIMARY SOFTWARE PATH</small>
+          <button id="traceBtn">TRACE DATA FLOW</button>
+        </div>
+        <div class="pulse-line" id="pulseLine"></div>
+      </div>
+    </div>
+
+    <aside class="detail" id="detail">
+      <div class="tag" id="detailTag">DATA MODEL</div>
+      <h3 id="detailTitle">FlightData structure</h3>
+      <p id="detailDesc">Central C structure representing temperature, altitude, velocity, battery voltage, timestamp and health status. MATLAB uses the same conceptual fields to keep software and simulation aligned.</p>
+      <pre id="detailFiles">firmware/.../flight_data.h
+matlab/functions/generate_flight_data.m</pre>
+      <div class="status"><span class="dot"></span> SOFTWARE INTEGRATED</div>
+      <div class="verif-flow">
+        <span class="node">FIELD DATA</span><span class="arrow">→</span>
+        <span class="node">STATE</span><span class="arrow">→</span>
+        <span class="node">TELEMETRY</span>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section id="engineering">
+  <div class="section-head">
+    <div><div class="section-no">03 / ENGINEERING</div><h2>Designed as a verification chain, not a single script.</h2></div>
+    <p class="lead">The project deliberately separates embedded implementation, numerical modeling and independent verification so a failure in one representation can be detected by another.</p>
+  </div>
+
+  <div class="grid3">
+    <div class="card"><div class="tag">Embedded</div><h3>STM32 Flight Computer</h3><p>STM32F446RETx firmware written in modular C using STM32 HAL, STM32CubeMX/CubeIDE and ARM GCC. The scheduler executes sensor update, timestamping, health checks, mission logic, packet construction and UART transmission.</p></div>
+    <div class="card"><div class="tag">Telemetry</div><h3>Binary Packet Engineering</h3><p>A fixed 22-byte frame carries synchronization, version, sequence, timestamp, scaled physical values, status and CRC16. The layout is compact, deterministic and independently decoded in Python.</p></div>
+    <div class="card"><div class="tag">Simulation</div><h3>MATLAB + Simulink</h3><p>MATLAB generates a deterministic 60-second flight-state sequence. Simulink executes a fixed-step 0.1-second model for block-level health and flight-computer behavior.</p></div>
+    <div class="card"><div class="tag">Reference model</div><h3>OpenRocket</h3><p>A deliberately small reference rocket provides independent trajectory data. The CSV is cleaned before being converted into MATLAB timeseries and injected into Simulink.</p></div>
+    <div class="card"><div class="tag">Independent test</div><h3>Python Verification</h3><p>The host checker reconstructs packet fields and recalculates CRC independently of the firmware implementation, reducing the chance that the same bug is repeated in both producer and verifier.</p></div>
+    <div class="card"><div class="tag">Engineering principle</div><h3>Cross-Validation</h3><p>Results are compared across representations rather than trusted because one program returned a plausible number. This is the core engineering pattern demonstrated by ATFIDP.</p></div>
+  </div>
+
+  <div class="callout">
+    <b>Engineering boundary:</b> ATFIDP is a software-first development and verification platform. It is not flight-qualified avionics and does not claim physical sensor validation, physical UART validation, flight testing, radiation assurance, or production timing qualification.
+  </div>
+</section>
+
+<section id="verification">
+  <div class="section-head">
+    <div><div class="section-no">04 / VERIFICATION</div><h2>Evidence from build, packet, simulation and integration tests.</h2></div>
+    <p class="lead">The final verification result measures software integration quality, not flight readiness.</p>
+  </div>
+
+  <div class="grid3" style="margin-bottom:18px">
+    <div class="card"><div class="metric-big">15/15</div><div class="metric-label">AUTOMATED INTEGRATION CHECKS</div></div>
+    <div class="card"><div class="metric-big">79</div><div class="metric-label">VALID OPENROCKET SAMPLES</div></div>
+    <div class="card"><div class="metric-big">22 B</div><div class="metric-label">TELEMETRY FRAME LENGTH</div></div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Verification Item</th><th>Observed Result</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>STM32 firmware build</td><td>0 errors · 0 warnings</td><td class="pass">PASS</td></tr>
+        <tr><td>Telemetry packet</td><td>22 bytes · fixed layout</td><td class="pass">PASS</td></tr>
+        <tr><td>Reference CRC</td><td>RX 0x1318 · CALC 0x1318</td><td class="pass">PASS</td></tr>
+        <tr><td>Python telemetry decode</td><td>All reference fields reconstructed</td><td class="pass">PASS</td></tr>
+        <tr><td>MATLAB simulation</td><td>60 s · 601 samples</td><td class="pass">PASS</td></tr>
+        <tr><td>Simulink model</td><td>Fixed-step 0.1 s model executes successfully</td><td class="pass">PASS</td></tr>
+        <tr><td>OpenRocket source</td><td>88 raw rows</td><td class="pass">PASS</td></tr>
+        <tr><td>Trajectory cleaning</td><td>9 invalid rows removed · 79 valid rows</td><td class="pass">PASS</td></tr>
+        <tr><td>Reference apogee</td><td>2.15 m</td><td class="pass">CHECKED</td></tr>
+        <tr><td>Reference maximum velocity</td><td>24.02 m/s</td><td class="pass">CHECKED</td></tr>
+        <tr><td>Reference maximum acceleration</td><td>18.98 m/s²</td><td class="pass">CHECKED</td></tr>
+        <tr><td>OpenRocket ↔ Simulink</td><td>Key trajectory results agree after preprocessing</td><td class="pass">PASS</td></tr>
+        <tr><td>Final integration verification</td><td>15 passed · 0 failed</td><td class="pass">PASS</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid2" style="margin-top:18px">
+    <div class="card">
+      <div class="tag">Reference telemetry</div>
+      <h3>22-byte frame</h3>
+      <pre>0–1    Sync
+2      Version
+3–6    Sequence
+7–10   Timestamp
+11–12  Temperature ×10
+13–14  Altitude
+15–16  Velocity ×10
+17–18  Battery ×100
+19     Status
+20–21  CRC16
+
+Reference:
+55 AA 01 00 00 00 00 00 00 00 00
+FA 00 E8 03 B0 04 60 09 00 18 13</pre>
+    </div>
+    <div class="card">
+      <div class="tag">Trajectory note</div>
+      <h3>Small reference rocket by design</h3>
+      <p>The OpenRocket case is intentionally small and is used to exercise the CSV → MATLAB → Simulink integration path. Its approximately 1.98-second flight and 2.15 m apogee should not be interpreted as a realistic launch-vehicle envelope.</p>
+      <div class="verif-flow">
+        <span class="node">OpenRocket</span><span class="arrow">→</span>
+        <span class="node">CSV</span><span class="arrow">→</span>
+        <span class="node">MATLAB</span><span class="arrow">→</span>
+        <span class="node">Simulink</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="log">
+  <div class="section-head">
+    <div><div class="section-no">05 / ENGINEERING LOG</div><h2>What broke — and what was changed.</h2></div>
+    <p class="lead">The engineering value is in the debugging trail as much as the final green checks.</p>
+  </div>
+  <div class="logs">
+    <div class="log"><code>MATLAB / namespace</code><div><b>Variable shadowed the Simulink sim() function.</b><p>A loaded variable named <code>sim</code> caused <code>sim(model_name)</code> to resolve incorrectly. The variable was renamed to <code>sim_data</code>, restoring the intended function call.</p></div></div>
+    <div class="log"><code>OPENROCKET / DATA</code><div><b>Raw trajectory contained invalid rows.</b><p>The reference CSV contained 88 raw samples, including 9 invalid/non-finite rows. A preprocessing step removed those rows before creating MATLAB timeseries, leaving 79 valid samples for cross-validation.</p></div></div>
+    <div class="log"><code>INTEGRATION / ALIGN</code><div><b>Trajectory data needed explicit time alignment.</b><p>The OpenRocket output was cleaned and converted into explicit time-series channels before Simulink execution. This made the reference-data path reproducible rather than relying on implicit data interpretation.</p></div></div>
+    <div class="log"><code>TELEMETRY / CRC</code><div><b>Packet correctness was checked independently.</b><p>The reference 22-byte packet produced CRC 0x1318. The Python verifier independently decoded the fields and recalculated the same CRC, producing a PASS result.</p></div></div>
+  </div>
+</section>
+
+<section id="knowledge">
+  <div class="section-head">
+    <div><div class="section-no">06 / KNOWLEDGE DOMAINS</div><h2>Used now — master next.</h2></div>
+    <p class="lead">The project is also a learning map. Cyan chips are concepts directly exercised; amber chips are areas that should be deepened to move from project-level competence toward production embedded aerospace engineering.</p>
+  </div>
+
+  <div class="card">
+    <div class="topic-group">
+      <h3>Embedded C & firmware architecture</h3>
+      <div class="chips">
+        <span class="chip">Embedded C</span><span class="chip">structs / enums</span><span class="chip">pointers</span><span class="chip">fixed-width integers</span><span class="chip">static / const</span><span class="chip">header/source separation</span><span class="chip">modular C</span><span class="chip">HAL</span><span class="chip">ARM GCC</span><span class="chip">ELF/build artifacts</span>
+        <span class="chip master">interrupt model</span><span class="chip master">volatile & memory ordering</span><span class="chip master">stack / heap / static memory</span><span class="chip master">linker scripts / map files</span><span class="chip master">DMA</span><span class="chip master">timers</span><span class="chip master">watchdog</span><span class="chip master">RTOS fundamentals</span>
+      </div>
+    </div>
+    <div class="topic-group">
+      <h3>Telemetry & digital communication</h3>
+      <div class="chips">
+        <span class="chip">packet framing</span><span class="chip">binary serialization</span><span class="chip">endianness</span><span class="chip">fixed-point scaling</span><span class="chip">CRC-16</span><span class="chip">UART / USART</span><span class="chip">115200 8-N-1</span>
+        <span class="chip master">UART interrupt / DMA</span><span class="chip master">framing recovery</span><span class="chip master">I2C / SPI</span><span class="chip master">CAN</span><span class="chip master">RS-422 / RS-485</span><span class="chip master">CCSDS packet concepts</span>
+      </div>
+    </div>
+    <div class="topic-group">
+      <h3>Aerospace flight software</h3>
+      <div class="chips">
+        <span class="chip">flight instrumentation</span><span class="chip">health monitoring</span><span class="chip">mission logic</span><span class="chip">telemetry</span><span class="chip">deterministic scheduling</span><span class="chip">fault states</span>
+        <span class="chip master">FDIR</span><span class="chip master">requirements traceability</span><span class="chip master">verification lifecycle</span><span class="chip master">flight software architecture</span><span class="chip master">timing determinism</span><span class="chip master">HIL / SIL / PIL</span><span class="chip master">hardware/software interface control</span>
+      </div>
+    </div>
+    <div class="topic-group">
+      <h3>MATLAB / Simulink / model-based engineering</h3>
+      <div class="chips">
+        <span class="chip">MATLAB scripting</span><span class="chip">deterministic simulation</span><span class="chip">Simulink blocks</span><span class="chip">fixed-step discrete model</span><span class="chip">timeseries</span><span class="chip">CSV preprocessing</span><span class="chip">model cross-check</span>
+        <span class="chip master">state-space modeling</span><span class="chip master">continuous vs discrete systems</span><span class="chip master">solver/timestep selection</span><span class="chip master">model verification</span><span class="chip master">code generation</span><span class="chip master">model-based design workflow</span>
+      </div>
+    </div>
+    <div class="topic-group">
+      <h3>Verification & testing</h3>
+      <div class="chips">
+        <span class="chip">automated tests</span><span class="chip">integration testing</span><span class="chip">independent implementation</span><span class="chip">fault cases</span><span class="chip">data cleaning</span><span class="chip">reproducibility</span>
+        <span class="chip master">requirements → test traceability</span><span class="chip master">boundary-value testing</span><span class="chip master">fault injection</span><span class="chip master">regression testing</span><span class="chip master">numerical tolerances</span><span class="chip master">coverage analysis</span><span class="chip master">timing / WCET measurement</span>
+      </div>
+    </div>
+    <div class="topic-group">
+      <h3>Rocket / trajectory data</h3>
+      <div class="chips">
+        <span class="chip">OpenRocket</span><span class="chip">trajectory CSV</span><span class="chip">apogee / velocity / acceleration</span><span class="chip">reference-model usage</span>
+        <span class="chip master">launch-vehicle dynamics</span><span class="chip master">aerodynamic assumptions</span><span class="chip master">sensor-model uncertainty</span><span class="chip master">model correlation limits</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>Recommended mastery direction:</b> the next step is not simply adding more aerospace software. Deepen the embedded boundary — interrupts, DMA, timers, memory/linker behavior, UART reliability, sensor buses, watchdog/fault handling, timing measurement and hardware/software integration — then progress toward HIL and real sensor interfaces.
+  </div>
+</section>
+
+<section id="portfolio">
+  <div class="section-head">
+    <div><div class="section-no">07 / PORTFOLIO</div><h2>Repository and adjacent systems work.</h2></div>
+    <p class="lead">ATFIDP is intended to sit inside a broader embedded, avionics and aerospace software portfolio.</p>
+  </div>
+  <div class="repo-grid">
+    <a class="repo" href="https://github.com/saiprabha-cy/aerospace-telemetry-flight-computer-platform" target="_blank" rel="noopener"><div><b>ATFIDP — Aerospace Telemetry Flight Computer Platform</b><br><span>Primary project · embedded C · STM32 · telemetry · MATLAB · Simulink</span></div><span>GITHUB ↗</span></a>
+    <a class="repo" href="https://github.com/saiprabha-cy/Launch-Vehicle-Ascent-Insertion-GNC-Digital-Twin" target="_blank" rel="noopener"><div><b>Launch Vehicle Ascent & Insertion GNC Digital Twin</b><br><span>MATLAB/Octave · mission simulation · GNC architecture</span></div><span>GITHUB ↗</span></a>
+    <a class="repo" href="https://github.com/saiprabha-cy/CubeSat-ADCS-Sim" target="_blank" rel="noopener"><div><b>CubeSat ADCS Simulation</b><br><span>Spacecraft attitude and control simulation work</span></div><span>GITHUB ↗</span></a>
+    <a class="repo" href="https://github.com/saiprabha-cy/kalman-attitude-estimation" target="_blank" rel="noopener"><div><b>Kalman Attitude Estimation</b><br><span>Estimation / sensor-fusion study</span></div><span>GITHUB ↗</span></a>
+    <a class="repo" href="https://github.com/saiprabha-cy/Mission-Operations-Communication-Platform-MOCP" target="_blank" rel="noopener"><div><b>Mission Operations & Communication Platform</b><br><span>Ground/mission communication architecture</span></div><span>GITHUB ↗</span></a>
+    <a class="repo" href="https://github.com/saiprabha-cy/planetary-rover-navigation" target="_blank" rel="noopener"><div><b>Planetary Rover Navigation</b><br><span>Autonomous navigation and robotics direction</span></div><span>GITHUB ↗</span></a>
+  </div>
+</section>
+
+<footer class="footer">
+  ATFIDP · AEROSPACE TELEMETRY, FLIGHT COMPUTER & INSTRUMENTATION DEVELOPMENT PLATFORM<br>
+  SOFTWARE-FIRST DEVELOPMENT / SIMULATION / VERIFICATION REPORT<br><br>
+  ENGINEERING CLAIMS ARE LIMITED TO THE IMPLEMENTED AND VERIFIED SOFTWARE SCOPE. NO FLIGHT-QUALIFICATION CLAIM IS IMPLIED.
+</footer>
+</main>
+
+<script>
+const details={
+  flightdata:{
+    tag:"Data model",title:"FlightData structure",
+    desc:"Central C structure representing temperature, altitude, velocity, battery voltage, timestamp and health status. MATLAB uses the same conceptual fields to keep software and simulation aligned.",
+    files:"firmware/.../flight_data.h\\nmatlab/functions/generate_flight_data.m"
+  },
+  health:{
+    tag:"Fault logic",title:"Health Monitor",
+    desc:"Checks battery and temperature thresholds and produces OK / WARNING / CRITICAL states. Unit tests exercise nominal and fault cases. The firmware and MATLAB implementations are intentionally modular so their behavior can be inspected independently.",
+    files:"health_monitor.c\\nhealth_monitor_model.m"
+  },
+  flight:{
+    tag:"Embedded logic",title:"Flight Controller + Scheduler",
+    desc:"Modular C execution path coordinating sensor update, timestamping, health evaluation, flight-controller logic, mission logic and telemetry at a deterministic 1 Hz software cycle.",
+    files:"scheduler.c\\nflight_controller.c\\nmission.c"
+  },
+  telemetry:{
+    tag:"Communications",title:"22-byte Binary Telemetry",
+    desc:"Compact fixed-layout packet with sync, version, sequence, timestamp, scaled sensor/state values, status and CRC16. Values use explicit integer representations and little-endian byte ordering.",
+    files:"telemetry.c\\ntelemetry.h\\nReference CRC: 0x1318"
+  },
+  transport:{
+    tag:"Transport",title:"UART Telemetry",
+    desc:"USART2 at 115200 8-N-1 provides the embedded transport interface. The current project verifies packet construction and software transmission logic; physical UART transmission has not been validated.",
+    files:"telemetry_uart.c\\nSTM32CubeMX configuration"
+  },
+  crosscheck:{
+    tag:"Final verification",title:"OpenRocket ↔ Simulink Cross-Validation",
+    desc:"The cleaned OpenRocket trajectory is converted to MATLAB timeseries and executed through Simulink. The final integration verification reported 15 passed checks and 0 failures.",
+    files:"scripts/verify_atfidp_integration.m\\n15 passed · 0 failed"
+  },
+  python:{
+    tag:"Independent verification",title:"Python Telemetry Checker",
+    desc:"Independent host-side decoder reconstructs the packet fields and recalculates CRC, providing a verification implementation separate from the STM32 code.",
+    files:"tools/verify_telemetry.py\\nResult: Telemetry verification PASS"
+  },
+  matlab:{
+    tag:"Numerical model",title:"MATLAB Flight Simulation",
+    desc:"Generates deterministic flight-state trajectories and validates health-monitor behavior over a 60-second simulation with 601 samples.",
+    files:"functions/generate_flight_data.m\\nscripts/run_simulation.m"
+  },
+  simulink:{
+    tag:"System model",title:"Simulink Flight-Computer Model",
+    desc:"Models the health-monitoring logic and executes the same scenario at a fixed 0.1-second step, providing block-level system verification.",
+    files:"models/ATFIDP_FlightComputer.slx"
+  },
+  openrocket:{
+    tag:"Independent trajectory source",title:"OpenRocket Reference Flight",
+    desc:"A small reference rocket simulation supplies independent trajectory data which is cleaned in MATLAB and injected into Simulink for cross-validation.",
+    files:"designs/ATFIDP_Test_Rocket.ork\\nsimulations/ATFIDP_reference_flight.csv"
+  }
+};
+
+const detail=document.getElementById("detail");
+const tag=document.getElementById("detailTag");
+const title=document.getElementById("detailTitle");
+const desc=document.getElementById("detailDesc");
+const files=document.getElementById("detailFiles");
+const bands=[...document.querySelectorAll(".band,.path")];
+
+function selectNode(id){
+  const d=details[id]; if(!d)return;
+  bands.forEach(x=>x.classList.toggle("selected",x.dataset.id===id));
+  tag.textContent=d.tag.toUpperCase();
+  title.textContent=d.title;
+  desc.textContent=d.desc;
+  files.textContent=d.files;
+  detail.animate([{opacity:.55,transform:"translateY(5px)"},{opacity:1,transform:"translateY(0)"}],{duration:220,easing:"ease-out"});
+}
+bands.forEach(x=>x.addEventListener("click",()=>selectNode(x.dataset.id)));
+
+const traceBtn=document.getElementById("traceBtn");
+const traceState=document.getElementById("traceState");
+const pulseLine=document.getElementById("pulseLine");
+traceBtn.addEventListener("click",()=>{
+  const seq=["flightdata","health","flight","telemetry","transport","crosscheck"];
+  let i=0;
+  traceBtn.disabled=true;
+  traceState.textContent="TRACE ACTIVE · FOLLOWING SOFTWARE DATA PATH";
+  pulseLine.classList.add("run");
+  const timer=setInterval(()=>{
+    selectNode(seq[i]);
+    const el=document.querySelector('[data-id="'+seq[i]+'"]');
+    if(el){el.classList.remove("pulse");void el.offsetWidth;el.classList.add("pulse");}
+    i++;
+    if(i>=seq.length){
+      clearInterval(timer);
+      setTimeout(()=>{
+        pulseLine.classList.remove("run");
+        traceState.textContent="TRACE COMPLETE · VERIFICATION PATH READY";
+        traceBtn.disabled=false;
+      },500);
+    }
+  },650);
+});
+
+const navLinks=[...document.querySelectorAll(".nav a")];
+const sections=navLinks.map(a=>document.querySelector(a.getAttribute("href")));
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      navLinks.forEach(a=>a.classList.toggle("active",a.getAttribute("href")==="#"+entry.target.id));
+    }
+  });
+},{rootMargin:"-35% 0px -55% 0px",threshold:0});
+sections.forEach(s=>s&&observer.observe(s));
+</script>
+</body>
+</html>
